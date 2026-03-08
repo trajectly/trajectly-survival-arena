@@ -2,7 +2,8 @@ __pycache__/
 *.pyc
 .venv/
 
-.trajectly/current/
+.trajectly/current/*
+!.trajectly/current/*.json
 .trajectly/reports/
 .trajectly/repros/
 .trajectly/artifacts/
