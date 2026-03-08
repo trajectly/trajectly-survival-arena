@@ -14,7 +14,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--agent",
         default=None,
-        help="Path to contender agent file. Defaults to ARENA_AGENT_PATH or agents/contenders/default.py",
+        help="Path to contender agent file. Defaults to agents/contenders/default.py",
     )
     return parser
 

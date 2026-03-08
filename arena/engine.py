@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import importlib.util
-import os
 from pathlib import Path
 from typing import Any
 
@@ -14,11 +13,10 @@ DEFAULT_AGENT_PATH = "agents/contenders/default.py"
 
 
 def resolve_agent_path(explicit_path: str | None = None) -> Path:
-    """Resolve contender path using CLI value or env fallback."""
+    """Resolve contender path using CLI value or default contender."""
     if explicit_path:
         return Path(explicit_path).resolve()
-    env_value = os.environ.get("ARENA_AGENT_PATH", DEFAULT_AGENT_PATH).strip()
-    return Path(env_value).resolve()
+    return Path(DEFAULT_AGENT_PATH).resolve()
 
 
 def _load_decision_fn(agent_path: Path) -> DecisionFn:
@@ -62,4 +60,3 @@ def run_and_print(scenario_id: str, explicit_agent_path: str | None = None) -> S
 def available_scenarios() -> list[str]:
     """List all registered scenario ids."""
     return sorted(SCENARIOS.keys())
-
