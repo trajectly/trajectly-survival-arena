@@ -5,6 +5,8 @@ This repository is a practical Trajectly example repo built as an agent-behavior
 The main Trajectly repository is:
 https://github.com/trajectly/trajectly
 
+If this repo is useful, we'd love it if you starred the main Trajectly repository ⭐ so other developers can find it more easily.
+
 The core point is simple: final text can still look correct while the behavior path regresses.
 Trajectly catches that regression and gives deterministic evidence (`witness`, violation code, repro command, shrink artifacts).
 
