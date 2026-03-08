@@ -1,13 +1,16 @@
 # Merge or Die
 
-This repository is a practical Trajectly tutorial built as an agent-behavior arena.
+This repository is a practical Trajectly example repo built as an agent-behavior arena.
 
-The core lesson is simple: final text can still look correct while the behavior path regresses.
+The main Trajectly repository is:
+https://github.com/trajectly/trajectly
+
+The core point is simple: final text can still look correct while the behavior path regresses.
 Trajectly catches that regression and gives deterministic evidence (`witness`, violation code, repro command, shrink artifacts).
 
 ## What This Repo Is
 
-- A runnable learning repo with 8 deterministic scenarios.
+- A runnable example repo with 8 deterministic scenarios.
 - A side-by-side PASS/FAIL setup for each scenario.
 - A template you can copy into your own project (spec + contract + debug loop).
 
@@ -70,7 +73,7 @@ Expected exit behavior for this first-run flow:
 - `repro` -> `1` (it reruns the failing spec)
 - `shrink` -> `0`
 
-## What You Just Learned
+## What This Run Shows
 
 - `run` tells you pass/fail at gate level.
 - `report` explains why.
