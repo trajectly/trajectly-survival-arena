@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+
+.trajectly/current/
+.trajectly/reports/
+.trajectly/repros/
+.trajectly/artifacts/
+.trajectly/tmp/
+
+trajectly_pr_comment.md
+arena_pr_meta.json
+death-card.png

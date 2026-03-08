@@ -1,0 +1,43 @@
+name: Scenario Proposal
+description: Propose a new cursed challenge for Merge or Die.
+title: "[scenario] "
+labels:
+  - scenario-proposal
+body:
+  - type: input
+    id: title
+    attributes:
+      label: Scenario title
+      placeholder: "The Cache Goblin"
+    validations:
+      required: true
+  - type: textarea
+    id: premise
+    attributes:
+      label: Premise
+      description: What is the cursed setup?
+    validations:
+      required: true
+  - type: textarea
+    id: expected_sequence
+    attributes:
+      label: Expected tool sequence
+      description: List expected operations in order.
+      placeholder: "tool:fetch_x -> tool:check_y -> tool:approve"
+    validations:
+      required: true
+  - type: textarea
+    id: likely_regression
+    attributes:
+      label: Failure class to demonstrate
+      description: Which Trajectly failure should this scenario highlight?
+      placeholder: "REFINEMENT_BASELINE_CALL_MISSING"
+    validations:
+      required: true
+  - type: textarea
+    id: why_not_final_text
+    attributes:
+      label: Why final-answer evals are insufficient here
+    validations:
+      required: true
+

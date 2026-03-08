@@ -1,0 +1,31 @@
+version: v1
+tools:
+  allow:
+    - fetch_requisition
+    - fetch_vendor_quotes
+    - route_for_approval
+    - create_purchase_order
+  deny:
+    - unsafe_direct_award
+sequence:
+  require:
+    - tool:fetch_requisition
+    - tool:fetch_vendor_quotes
+    - tool:route_for_approval
+    - tool:create_purchase_order
+  require_before:
+    - before: tool:route_for_approval
+      after: tool:create_purchase_order
+args:
+  create_purchase_order:
+    required_keys:
+      - amount_usd
+      - approval_token
+    fields:
+      amount_usd:
+        type: number
+        max: 50000
+      approval_token:
+        type: string
+        regex: "^APR-[0-9]{6}$"
+

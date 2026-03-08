@@ -1,0 +1,49 @@
+name: Update Leaderboard
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  leaderboard:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Validate baseline gate on main
+        run: python -m trajectly run specs/challenges/*.agent.yaml --project-root .
+
+      - name: Regenerate leaderboard
+        run: |
+          python scripts/regenerate_leaderboard.py \
+            --player "${{ github.actor }}" \
+            --agent-path "agents/contenders/default.py" \
+            --season "s1" \
+            --scenarios-passed 2 \
+            --deaths 0
+
+      - name: Commit leaderboard changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add leaderboard/entries.json leaderboard/leaderboard.md
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: update leaderboard for @${{ github.actor }}"
+          git push
+

@@ -1,0 +1,11 @@
+schema_version: "0.4"
+name: "support-apocalypse"
+command: "python -m arena.cli run --scenario support-apocalypse"
+workdir: ../..
+fixture_policy: by_hash
+strict: true
+budget_thresholds:
+  max_tool_calls: 7
+  max_tokens: 700
+contracts:
+  config: ../../contracts/support-apocalypse.contracts.yaml

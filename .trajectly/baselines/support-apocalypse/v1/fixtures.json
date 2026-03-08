@@ -1,0 +1,65 @@
+{
+  "entries": [
+    {
+      "error": null,
+      "input_hash": "971c74a26330912d2f7729d223d6de410ba2d5a940ed7a02068127e095e3cee6",
+      "input_payload": {
+        "args": [
+          "TCK-1001"
+        ],
+        "kwargs": {}
+      },
+      "kind": "tool",
+      "name": "fetch_ticket",
+      "output_payload": {
+        "error": null,
+        "output": {
+          "issue_type": "duplicate_charge",
+          "plan": "enterprise",
+          "priority": "p1",
+          "ticket_id": "TCK-1001"
+        }
+      }
+    },
+    {
+      "error": null,
+      "input_hash": "87031825de30b429413c99765c47df892813f97a433e4d299da4291658812dcb",
+      "input_payload": {
+        "args": [
+          "enterprise"
+        ],
+        "kwargs": {}
+      },
+      "kind": "tool",
+      "name": "check_entitlements",
+      "output_payload": {
+        "error": null,
+        "output": {
+          "human_escalation": true,
+          "plan": "enterprise"
+        }
+      }
+    },
+    {
+      "error": null,
+      "input_hash": "e483784886723db2ea06d376d2f869d6027e12c4b17df8a1625cd87a729bad81",
+      "input_payload": {
+        "args": [],
+        "kwargs": {
+          "incident_id": "INC-230001",
+          "reason_code": "duplicate_charge"
+        }
+      },
+      "kind": "tool",
+      "name": "escalate_to_human",
+      "output_payload": {
+        "error": null,
+        "output": {
+          "incident_id": "INC-230001",
+          "queue": "billing-escalations",
+          "reason_code": "duplicate_charge"
+        }
+      }
+    }
+  ]
+}
