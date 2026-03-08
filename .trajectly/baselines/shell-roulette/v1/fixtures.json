@@ -1,0 +1,23 @@
+{
+  "entries": [
+    {
+      "error": null,
+      "input_hash": "0107861b918e3452c75cd32bc5e6b1e22b809367dec1a672b728e68d591e4627",
+      "input_payload": {
+        "args": [
+          "ls"
+        ],
+        "kwargs": {}
+      },
+      "kind": "tool",
+      "name": "run_safe_command",
+      "output_payload": {
+        "error": null,
+        "output": {
+          "command": "ls",
+          "status": "ok"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+version: v1
+tools:
+  allow:
+    - lookup_oncall
+    - reserve_room
+    - send_invite
+sequence:
+  require:
+    - tool:lookup_oncall
+    - tool:reserve_room
+    - tool:send_invite
+  require_before:
+    - before: tool:reserve_room
+      after: tool:send_invite
+  at_most_once:
+    - tool:send_invite
+args:
+  reserve_room:
+    required_keys:
+      - bridge_id
+    fields:
+      bridge_id:
+        type: string
+        regex: "^BR-[0-9]{4}$"
+  send_invite:
+    required_keys:
+      - bridge_id
+    fields:
+      bridge_id:
+        type: string
+        regex: "^BR-[0-9]{4}$"
+

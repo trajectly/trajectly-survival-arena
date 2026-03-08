@@ -17,28 +17,32 @@ Final-answer checks can miss important regressions:
 
 Trajectly catches those using trajectory-level checks over deterministic replay.
 
-## Launch scenarios
+## Scenarios
 
 - `procurement-chaos` (Budget Dragon)
 - `support-apocalypse` (Ticket Apocalypse)
+- `secret-karaoke` (Secret Karaoke)
+- `shell-roulette` (Shell Roulette)
+- `calendar-thunderdome` (Calendar Thunderdome)
 
-Both are deterministic, local, and do not require API keys.
+All scenarios are deterministic, local, and do not require API keys.
 
 ## Quickstart
 
 ```bash
-python -m pip install -r requirements.txt
-python -m trajectly --version
-python -m trajectly init
-python -m trajectly run specs/challenges/*.agent.yaml --project-root .
-python -m trajectly report
+python -m venv .venv
+./.venv/bin/python -m pip install -r requirements.txt
+./.venv/bin/python -m trajectly --version
+./.venv/bin/python -m trajectly init
+PATH="$PWD/.venv/bin:$PATH" ./.venv/bin/python -m trajectly run specs/challenges/*.agent.yaml --project-root .
+./.venv/bin/python -m trajectly report
 ```
 
 If a run fails:
 
 ```bash
-python -m trajectly repro
-python -m trajectly shrink
+./.venv/bin/python -m trajectly repro
+./.venv/bin/python -m trajectly shrink
 ```
 
 ## Intentional regression demo
@@ -46,10 +50,10 @@ python -m trajectly shrink
 Run with the unsafe demo contender to see trajectory-level failure:
 
 ```bash
-ARENA_AGENT_PATH=agents/contenders/unsafe_demo.py python -m trajectly run specs/challenges/*.agent.yaml --project-root .
-python -m trajectly report
-python -m trajectly repro
-python -m trajectly shrink
+PATH="$PWD/.venv/bin:$PATH" ARENA_AGENT_PATH=agents/contenders/unsafe_demo.py ./.venv/bin/python -m trajectly run specs/challenges/*.agent.yaml --project-root .
+./.venv/bin/python -m trajectly report
+PATH="$PWD/.venv/bin:$PATH" ARENA_AGENT_PATH=agents/contenders/unsafe_demo.py ./.venv/bin/python -m trajectly repro
+PATH="$PWD/.venv/bin:$PATH" ARENA_AGENT_PATH=agents/contenders/unsafe_demo.py ./.venv/bin/python -m trajectly shrink
 ```
 
 Typical failure cues:
@@ -61,7 +65,7 @@ Typical failure cues:
 
 1. Copy `agents/template_agent.py` to `agents/contenders/<your_handle>.py`.
 2. Run locally with your agent path:
-   - `ARENA_AGENT_PATH=agents/contenders/<your_handle>.py python -m trajectly run specs/challenges/*.agent.yaml --project-root .`
+   - `PATH="$PWD/.venv/bin:$PATH" ARENA_AGENT_PATH=agents/contenders/<your_handle>.py ./.venv/bin/python -m trajectly run specs/challenges/*.agent.yaml --project-root .`
 3. Open a PR.
 4. CI posts a pass/fail comment and uploads `.trajectly/**` artifacts.
 
@@ -80,4 +84,5 @@ scripts/                  leaderboard and card helpers
 ## Notes
 
 - Baselines and fixtures are committed for deterministic CI.
-- Dynamic outputs (`.trajectly/reports`, `.trajectly/repros`, `.trajectly/current`) are ignored.
+- Dynamic outputs (`.trajectly/reports`, `.trajectly/repros`, `.trajectly/current/*.run.jsonl`) are ignored.
+- Baseline pointers in `.trajectly/current/*.json` are committed.

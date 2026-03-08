@@ -1,0 +1,38 @@
+{
+  "entries": [
+    {
+      "error": null,
+      "input_hash": "97fcdad9fe31227a9ec60e519ff7635ac71941c55b77e585c908db1fa6406030",
+      "input_payload": {
+        "args": [],
+        "kwargs": {}
+      },
+      "kind": "tool",
+      "name": "fetch_logs",
+      "output_payload": {
+        "error": null,
+        "output": "user_login ok token=sk_live_redacted"
+      }
+    },
+    {
+      "error": null,
+      "input_hash": "1509dae63aa5bfbce0595bb756aac70ed24ac85e808ba2b619b375ddb547bc92",
+      "input_payload": {
+        "args": [],
+        "kwargs": {
+          "channel": "eng-alerts",
+          "text": "all clean"
+        }
+      },
+      "kind": "tool",
+      "name": "post_summary",
+      "output_payload": {
+        "error": null,
+        "output": {
+          "channel": "eng-alerts",
+          "text": "all clean"
+        }
+      }
+    }
+  ]
+}

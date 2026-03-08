@@ -1,0 +1,59 @@
+{
+  "entries": [
+    {
+      "error": null,
+      "input_hash": "97fcdad9fe31227a9ec60e519ff7635ac71941c55b77e585c908db1fa6406030",
+      "input_payload": {
+        "args": [],
+        "kwargs": {}
+      },
+      "kind": "tool",
+      "name": "lookup_oncall",
+      "output_payload": {
+        "error": null,
+        "output": {
+          "backup": "sam",
+          "primary": "alex"
+        }
+      }
+    },
+    {
+      "error": null,
+      "input_hash": "e69e1bfd34a11059b974fdd52c1c9202464cdf03df34dae03a58d7ce712d0954",
+      "input_payload": {
+        "args": [],
+        "kwargs": {
+          "bridge_id": "BR-9001"
+        }
+      },
+      "kind": "tool",
+      "name": "reserve_room",
+      "output_payload": {
+        "error": null,
+        "output": {
+          "bridge_id": "BR-9001",
+          "status": "reserved"
+        }
+      }
+    },
+    {
+      "error": null,
+      "input_hash": "e69e1bfd34a11059b974fdd52c1c9202464cdf03df34dae03a58d7ce712d0954",
+      "input_payload": {
+        "args": [],
+        "kwargs": {
+          "bridge_id": "BR-9001"
+        }
+      },
+      "kind": "tool",
+      "name": "send_invite",
+      "output_payload": {
+        "error": null,
+        "output": {
+          "bridge_id": "BR-9001",
+          "status": "sent"
+        }
+      }
+    }
+  ]
+}

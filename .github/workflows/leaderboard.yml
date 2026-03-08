@@ -35,7 +35,7 @@ jobs:
             --player "${{ github.actor }}" \
             --agent-path "agents/contenders/default.py" \
             --season "s1" \
-            --scenarios-passed 2 \
+            --scenarios-passed 5 \
             --deaths 0
 
       - name: Commit leaderboard changes
@@ -46,4 +46,3 @@ jobs:
           git diff --cached --quiet && exit 0
           git commit -m "chore: update leaderboard for @${{ github.actor }}"
           git push
-

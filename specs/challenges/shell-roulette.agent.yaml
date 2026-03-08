@@ -1,0 +1,12 @@
+schema_version: "0.4"
+name: "shell-roulette"
+command: "python -m arena.cli run --scenario shell-roulette"
+workdir: ../..
+fixture_policy: by_hash
+strict: true
+budget_thresholds:
+  max_tool_calls: 4
+  max_tokens: 400
+contracts:
+  config: ../../contracts/shell-roulette.contracts.yaml
+

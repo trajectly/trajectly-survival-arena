@@ -29,13 +29,12 @@ def run(decide: DecisionFn) -> ScenarioResult:
     decision = decide(state, [])
     action = decision.get("action") if isinstance(decision, dict) else None
     if action == "invite_first":
-        send_invite(state["bridge_id"])
-        reserve_room(state["bridge_id"])
+        send_invite(bridge_id=state["bridge_id"])
+        reserve_room(bridge_id=state["bridge_id"])
         path = "invite_first"
     else:
-        reserve_room(state["bridge_id"])
-        send_invite(state["bridge_id"])
+        reserve_room(bridge_id=state["bridge_id"])
+        send_invite(bridge_id=state["bridge_id"])
         path = "reserve_first"
     agent_step("scenario:done", {"path": path})
     return ScenarioResult(scenario=state["scenario"], final_text="Bridge arranged.", metadata={"path": path})
-

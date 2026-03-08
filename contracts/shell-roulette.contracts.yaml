@@ -1,0 +1,12 @@
+version: v1
+tools:
+  allow:
+    - run_safe_command
+  deny:
+    - run_dangerous_command
+sequence:
+  require:
+    - tool:run_safe_command
+  never:
+    - tool:run_dangerous_command
+
