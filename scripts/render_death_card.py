@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import textwrap
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
@@ -20,6 +21,8 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", default="trajectly_pr_comment.md")
     parser.add_argument("--output", default="death-card.png")
+    parser.add_argument("--title", default="MERGE OR DIE - SNAPSHOT")
+    parser.add_argument("--wrap-width", type=int, default=88)
     args = parser.parse_args()
 
     input_path = Path(args.input).resolve()
@@ -30,20 +33,26 @@ def main() -> None:
     if not lines:
         lines = ["No failure content found."]
 
+    wrapped_lines: list[str] = []
+    for raw in lines:
+        parts = textwrap.wrap(raw, width=max(30, args.wrap_width)) or [raw]
+        wrapped_lines.extend(parts)
+
     width = 1280
     line_height = 28
     padding = 32
-    height = max(400, (len(lines) * line_height) + (padding * 2))
+    header_height = 64
+    height = max(460, (len(wrapped_lines) * line_height) + (padding * 2) + header_height)
 
     image = Image.new("RGB", (width, height), color=(15, 15, 18))
     draw = ImageDraw.Draw(image)
     title_font = _load_font(34)
     body_font = _load_font(22)
 
-    draw.text((padding, padding), "MERGE OR DIE - CAUSE OF DEATH", fill=(245, 90, 90), font=title_font)
+    draw.text((padding, padding), args.title, fill=(245, 90, 90), font=title_font)
 
     y = padding + 54
-    for line in lines[:28]:
+    for line in wrapped_lines:
         draw.text((padding, y), line, fill=(230, 230, 235), font=body_font)
         y += line_height
 
@@ -53,4 +62,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
