@@ -89,6 +89,20 @@ jobs:
                   witness = row.get("trt_witness_index", "n/a")
                   primary = row.get("trt_primary_violation") or {}
                   code = primary.get("code", "n/a") if isinstance(primary, dict) else "n/a"
+                  if code == "n/a":
+                      report_json = row.get("report_json")
+                      if isinstance(report_json, str):
+                          report_file = Path(report_json)
+                          if report_file.exists():
+                              report_payload = json.loads(report_file.read_text(encoding="utf-8"))
+                              summary = report_payload.get("summary") if isinstance(report_payload, dict) else {}
+                              if isinstance(summary, dict):
+                                  classifications = summary.get("classifications") or {}
+                                  if isinstance(classifications, dict) and classifications:
+                                      if "budget_breach" in classifications:
+                                          code = "BUDGET_BREACH"
+                                      else:
+                                          code = sorted(str(key).upper() for key in classifications.keys())[0]
                   lines.append(f"| `{spec}` | `{status}` | `{witness}` | `{code}` |")
           else:
               lines.append("| n/a | n/a | n/a | n/a |")

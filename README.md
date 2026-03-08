@@ -1,6 +1,6 @@
 # Merge or Die
 
-Learn Trajectly by playing five deterministic agent scenarios.
+Learn Trajectly by playing eight deterministic agent scenarios.
 
 This repo is designed to teach one core lesson:
 final answers can look fine while behavior regresses underneath.  
@@ -71,7 +71,9 @@ sequence:
 
 ## Scenario Walkthroughs
 
-All outputs below were verified on local runs for each single spec.
+All outputs below were verified on local runs for each single spec using:
+- safe contender: `agents/contenders/default.py`
+- failing contender: `agents/contenders/unsafe_demo.py`
 
 ---
 
@@ -352,6 +354,174 @@ PASS snapshot:
 FAIL snapshot:
 
 ![Calendar FAIL](assets/scenario-cards/calendar-thunderdome-fail.png)
+
+---
+
+### 6) Graph Chain Reaction (`graph-chain-reaction`)
+
+Goal:
+- Keep graph output compliant by sending a valid dispatch token.
+
+What output-only checks miss:
+- Final text can still look correct while graph node arguments violate required format.
+
+Trajectly feature focus:
+- Declarative graph instrumentation (`trajectly.App`) + argument contracts.
+- Typical fail: `CONTRACT_ARGS_REGEX_VIOLATION`.
+
+Run PASS:
+
+```bash
+python -m trajectly run specs/challenges/graph-chain-reaction.agent.yaml --project-root .
+python -m trajectly report --json
+```
+
+Expected PASS snippet:
+
+```text
+graph-chain-reaction: status=PASS witness=None code=None
+```
+
+Run FAIL:
+
+```bash
+ARENA_AGENT_PATH=agents/contenders/unsafe_demo.py \
+python -m trajectly run specs/challenges/graph-chain-reaction.agent.yaml --project-root .
+python -m trajectly report --json
+```
+
+Expected FAIL snippet:
+
+```text
+graph-chain-reaction: status=FAIL witness=6 code=CONTRACT_ARGS_REGEX_VIOLATION
+```
+
+Debug commands:
+
+```bash
+ARENA_AGENT_PATH=agents/contenders/unsafe_demo.py python -m trajectly repro
+ARENA_AGENT_PATH=agents/contenders/unsafe_demo.py python -m trajectly shrink
+```
+
+PASS snapshot:
+
+![Graph PASS](assets/scenario-cards/graph-chain-reaction-pass.png)
+
+FAIL snapshot:
+
+![Graph FAIL](assets/scenario-cards/graph-chain-reaction-fail.png)
+
+---
+
+### 7) Network No-Fly Zone (`network-no-fly-zone`)
+
+Goal:
+- Keep outbound requests inside approved domains.
+
+What output-only checks miss:
+- Agent can still report success while routing requests to unapproved domains.
+
+Trajectly feature focus:
+- `contracts.network` domain policy enforcement.
+- Typical fail: `NETWORK_DOMAIN_DENIED`.
+
+Run PASS:
+
+```bash
+python -m trajectly run specs/challenges/network-no-fly-zone.agent.yaml --project-root .
+python -m trajectly report --json
+```
+
+Expected PASS snippet:
+
+```text
+network-no-fly-zone: status=PASS witness=None code=None
+```
+
+Run FAIL:
+
+```bash
+ARENA_AGENT_PATH=agents/contenders/unsafe_demo.py \
+python -m trajectly run specs/challenges/network-no-fly-zone.agent.yaml --project-root .
+python -m trajectly report --json
+```
+
+Expected FAIL snippet:
+
+```text
+network-no-fly-zone: status=FAIL witness=2 code=NETWORK_DOMAIN_DENIED
+```
+
+Debug commands:
+
+```bash
+ARENA_AGENT_PATH=agents/contenders/unsafe_demo.py python -m trajectly repro
+ARENA_AGENT_PATH=agents/contenders/unsafe_demo.py python -m trajectly shrink
+```
+
+PASS snapshot:
+
+![Network PASS](assets/scenario-cards/network-no-fly-zone-pass.png)
+
+FAIL snapshot:
+
+![Network FAIL](assets/scenario-cards/network-no-fly-zone-fail.png)
+
+---
+
+### 8) Budget Gauntlet (`budget-gauntlet`)
+
+Goal:
+- Keep sampling inside tool-call budget.
+
+What output-only checks miss:
+- Final text can still look identical while the run exceeds cost/latency budgets.
+
+Trajectly feature focus:
+- `budget_thresholds` gate.
+- Typical fail: `BUDGET_BREACH` (diff summary classification).
+
+Run PASS:
+
+```bash
+python -m trajectly run specs/challenges/budget-gauntlet.agent.yaml --project-root .
+python -m trajectly report --json
+```
+
+Expected PASS snippet:
+
+```text
+budget-gauntlet: status=PASS witness=None code=None
+```
+
+Run FAIL:
+
+```bash
+ARENA_AGENT_PATH=agents/contenders/unsafe_demo.py \
+python -m trajectly run specs/challenges/budget-gauntlet.agent.yaml --project-root .
+python -m trajectly report --json
+```
+
+Expected FAIL snippet:
+
+```text
+budget-gauntlet: status=FAIL witness=None code=BUDGET_BREACH
+```
+
+Debug commands:
+
+```bash
+ARENA_AGENT_PATH=agents/contenders/unsafe_demo.py python -m trajectly repro
+ARENA_AGENT_PATH=agents/contenders/unsafe_demo.py python -m trajectly shrink
+```
+
+PASS snapshot:
+
+![Budget PASS](assets/scenario-cards/budget-gauntlet-pass.png)
+
+FAIL snapshot:
+
+![Budget FAIL](assets/scenario-cards/budget-gauntlet-fail.png)
 
 ## Try It Yourself
 

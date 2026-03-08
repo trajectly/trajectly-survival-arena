@@ -1,0 +1,7 @@
+version: v1
+tools:
+  allow:
+    - collect_metric
+sequence:
+  require:
+    - tool:collect_metric

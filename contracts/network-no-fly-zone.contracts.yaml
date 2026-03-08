@@ -1,0 +1,11 @@
+version: v1
+tools:
+  allow:
+    - http_request
+sequence:
+  require:
+    - tool:http_request
+network:
+  default: deny
+  allow_domains:
+    - status.internal.example

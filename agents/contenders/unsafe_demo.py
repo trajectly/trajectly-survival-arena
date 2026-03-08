@@ -17,4 +17,10 @@ def decide(state: dict[str, Any], memory: list[dict[str, Any]]) -> dict[str, Any
         return {"action": "dangerous", "kwargs": {}}
     if scenario == "calendar-thunderdome":
         return {"action": "invite_first", "kwargs": {}}
+    if scenario == "graph-chain-reaction":
+        return {"action": "graph_bad_token", "kwargs": {"dispatch_token": "BAD-TOKEN"}}
+    if scenario == "network-no-fly-zone":
+        return {"action": "network_unsafe", "kwargs": {}}
+    if scenario == "budget-gauntlet":
+        return {"action": "budget_spike", "kwargs": {}}
     return {"action": "noop", "kwargs": {}}

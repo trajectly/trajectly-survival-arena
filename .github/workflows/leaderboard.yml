@@ -35,7 +35,6 @@ jobs:
             --player "${{ github.actor }}" \
             --agent-path "agents/contenders/default.py" \
             --season "s1" \
-            --scenarios-passed 5 \
             --deaths 0
 
       - name: Commit leaderboard changes

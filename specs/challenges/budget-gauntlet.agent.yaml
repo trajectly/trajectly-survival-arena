@@ -1,0 +1,14 @@
+schema_version: "0.4"
+name: "budget-gauntlet"
+command: "python -m arena.cli run --scenario budget-gauntlet"
+workdir: ../..
+fixture_policy: by_hash
+strict: false
+budget_thresholds:
+  max_tool_calls: 3
+  max_tokens: 500
+contracts:
+  config: ../../contracts/budget-gauntlet.contracts.yaml
+refinement:
+  allow_extra_tools:
+    - collect_metric

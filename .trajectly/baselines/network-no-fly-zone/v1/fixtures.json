@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "error": null,
+      "input_hash": "a1a0d8526886a72af2a03c5420d7af36bec46d9c8911ca0c738370552a8e3e53",
+      "input_payload": {
+        "args": [],
+        "kwargs": {
+          "url": "https://status.internal.example/health"
+        }
+      },
+      "kind": "tool",
+      "name": "http_request",
+      "output_payload": {
+        "error": null,
+        "output": {
+          "host": "status.internal.example",
+          "status": "ok",
+          "url": "https://status.internal.example/health"
+        }
+      }
+    }
+  ]
+}

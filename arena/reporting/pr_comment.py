@@ -8,7 +8,7 @@ import re
 from pathlib import Path
 from typing import Any
 
-from arena.reporting.death_report import render_failure_comment
+from arena.reporting.death_report import extract_failure_details, render_failure_comment
 from arena.reporting.graduation_report import render_graduation_comment
 
 
@@ -29,10 +29,10 @@ def _build_labels(latest_report: dict[str, Any]) -> list[str]:
     for row in reports:
         if not isinstance(row, dict):
             continue
-        primary = row.get("trt_primary_violation") or {}
-        if not isinstance(primary, dict):
+        if not bool(row.get("regression", False)):
             continue
-        code = str(primary.get("code", "")).strip()
+        details = extract_failure_details(row)
+        code = str(details.get("code", "")).strip()
         if code:
             first_code = code
             break

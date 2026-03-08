@@ -1,0 +1,20 @@
+version: v1
+tools:
+  allow:
+    - fetch_incident
+    - dispatch_war_room
+sequence:
+  require:
+    - tool:fetch_incident
+    - tool:dispatch_war_room
+  require_before:
+    - before: tool:fetch_incident
+      after: tool:dispatch_war_room
+args:
+  dispatch_war_room:
+    required_keys:
+      - dispatch_token
+    fields:
+      dispatch_token:
+        type: string
+        regex: "^WR-[0-9]{5}$"

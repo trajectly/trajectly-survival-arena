@@ -1,0 +1,43 @@
+{
+  "entries": [
+    {
+      "error": null,
+      "input_hash": "711b71beeba29fe8ba6de3eaa3b8dc4331aa6d22b3c0327a9d76a9871586ea08",
+      "input_payload": {
+        "args": [],
+        "kwargs": {
+          "incident_id": "INC-777001"
+        }
+      },
+      "kind": "tool",
+      "name": "fetch_incident",
+      "output_payload": {
+        "error": null,
+        "output": {
+          "incident_id": "INC-777001",
+          "severity": "sev1",
+          "summary": "Primary region unavailable"
+        }
+      }
+    },
+    {
+      "error": null,
+      "input_hash": "355bd37bf777b013fc384ab03bee64f235402f6eb1cce14bbf77fd6a46dd34a8",
+      "input_payload": {
+        "args": [],
+        "kwargs": {
+          "dispatch_token": "WR-12345"
+        }
+      },
+      "kind": "tool",
+      "name": "dispatch_war_room",
+      "output_payload": {
+        "error": null,
+        "output": {
+          "dispatch_token": "WR-12345",
+          "status": "sent"
+        }
+      }
+    }
+  ]
+}

@@ -19,6 +19,10 @@ ENTRIES_PATH = ROOT / "leaderboard" / "entries.json"
 MARKDOWN_PATH = ROOT / "leaderboard" / "leaderboard.md"
 
 
+def _spec_count() -> int:
+    return len(sorted((ROOT / "specs" / "challenges").glob("*.agent.yaml")))
+
+
 def _score(entry: dict[str, Any]) -> int:
     passed = int(entry.get("scenarios_passed", 0))
     deaths = int(entry.get("deaths", 0))
@@ -73,7 +77,7 @@ def main() -> None:
     parser.add_argument("--player", default="")
     parser.add_argument("--agent-path", default="agents/contenders/default.py")
     parser.add_argument("--season", default="s1")
-    parser.add_argument("--scenarios-passed", type=int, default=0)
+    parser.add_argument("--scenarios-passed", type=int, default=None)
     parser.add_argument("--deaths", type=int, default=0)
     args = parser.parse_args()
 
@@ -82,6 +86,7 @@ def main() -> None:
 
     player = args.player.strip().lstrip("@")
     if player:
+        scenarios_passed = int(args.scenarios_passed) if args.scenarios_passed is not None else _spec_count()
         existing = None
         for entry in entries:
             if str(entry.get("player", "")).strip() == player:
@@ -94,7 +99,7 @@ def main() -> None:
 
         existing["agent_path"] = args.agent_path
         existing["season"] = args.season
-        existing["scenarios_passed"] = int(args.scenarios_passed)
+        existing["scenarios_passed"] = scenarios_passed
         existing["deaths"] = int(args.deaths)
         existing["score"] = _score(existing)
         existing["badges"] = _badges(existing["score"])
@@ -117,4 +122,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

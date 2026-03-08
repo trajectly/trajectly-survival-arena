@@ -33,5 +33,13 @@ def decide(state: dict[str, Any], memory: list[dict[str, Any]]) -> dict[str, Any
     if scenario == "calendar-thunderdome":
         return {"action": "reserve_then_invite", "kwargs": {"bridge_id": "BR-9001"}}
 
-    return {"action": "noop", "kwargs": {}}
+    if scenario == "graph-chain-reaction":
+        return {"action": "graph_dispatch", "kwargs": {"dispatch_token": "WR-12345"}}
 
+    if scenario == "network-no-fly-zone":
+        return {"action": "network_safe", "kwargs": {}}
+
+    if scenario == "budget-gauntlet":
+        return {"action": "budget_safe", "kwargs": {}}
+
+    return {"action": "noop", "kwargs": {}}

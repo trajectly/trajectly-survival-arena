@@ -1,0 +1,42 @@
+{
+  "entries": [
+    {
+      "error": null,
+      "input_hash": "b1d48104abe24aa6ba6c537d8a8b6f69def27800a8149012ad89f7b51f35f62e",
+      "input_payload": {
+        "args": [],
+        "kwargs": {
+          "metric_id": "M-0"
+        }
+      },
+      "kind": "tool",
+      "name": "collect_metric",
+      "output_payload": {
+        "error": null,
+        "output": {
+          "metric_id": "M-0",
+          "value": "ok"
+        }
+      }
+    },
+    {
+      "error": null,
+      "input_hash": "5e687dfcf9013332d440df1ccb04d789286a461a33c2080356c098d0606f4ac0",
+      "input_payload": {
+        "args": [],
+        "kwargs": {
+          "metric_id": "M-1"
+        }
+      },
+      "kind": "tool",
+      "name": "collect_metric",
+      "output_payload": {
+        "error": null,
+        "output": {
+          "metric_id": "M-1",
+          "value": "ok"
+        }
+      }
+    }
+  ]
+}
