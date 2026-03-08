@@ -6,6 +6,19 @@
       "Survivor"
     ],
     "deaths": 0,
+    "last_updated": "2026-03-08T00:48:53Z",
+    "player": "aashmawy",
+    "scenarios_passed": 2,
+    "score": 200,
+    "season": "s1"
+  },
+  {
+    "agent_path": "agents/contenders/default.py",
+    "badges": [
+      "Seed",
+      "Survivor"
+    ],
+    "deaths": 0,
     "last_updated": "2026-03-08T00:00:00Z",
     "player": "system",
     "scenarios_passed": 2,
