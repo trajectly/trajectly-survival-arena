@@ -472,7 +472,7 @@ What output-only checks miss:
 
 Trajectly feature focus:
 - `budget_thresholds` gate.
-- Typical fail: `BUDGET_BREACH` (diff summary classification).
+- Typical fail signal: regression with `budget_breach` in per-spec report classifications.
 
 Run PASS:
 
@@ -497,7 +497,9 @@ python -m trajectly report --json
 Expected FAIL snippet:
 
 ```text
-budget-gauntlet: status=FAIL witness=None code=BUDGET_BREACH
+- `budget-gauntlet`: regression
+  - trt: `PASS`
+  - note: `.trajectly/reports/budget-gauntlet.json` includes `summary.classifications.budget_breach`
 ```
 
 Debug commands:
@@ -505,6 +507,12 @@ Debug commands:
 ```bash
 python -m trajectly repro
 python -m trajectly shrink
+```
+
+Expected debug cue for this scenario:
+
+```text
+ERROR: Shrink requires a failing TRT trace for `budget-gauntlet`
 ```
 
 PASS snapshot:
