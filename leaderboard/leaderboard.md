@@ -2,5 +2,5 @@
 
 | Rank | Player | Score | Passed | Deaths | Badges | Updated |
 |---:|---|---:|---:|---:|---|---|
-| 1 | @aashmawy | 800 | 8 | 0 | Seed, Survivor, Apex | 2026-03-08T03:33:32Z |
+| 1 | @aashmawy | 800 | 8 | 0 | Seed, Survivor, Apex | 2026-03-08T03:38:42Z |
 | 2 | @system | 500 | 5 | 0 | Seed, Survivor, Apex | 2026-03-08T00:00:00Z |
