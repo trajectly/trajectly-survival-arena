@@ -1,126 +1,188 @@
 # Merge or Die
 
-Learn Trajectly by playing eight deterministic agent scenarios.
+This repository is a practical Trajectly tutorial built as an agent-behavior arena.
 
-This repo is designed to teach one core lesson:
-final answers can look fine while behavior regresses underneath.  
-Trajectly catches those behavior regressions and gives you reproducible evidence.
+The core lesson is simple: final text can still look correct while the behavior path regresses.
+Trajectly catches that regression and gives deterministic evidence (`witness`, violation code, repro command, shrink artifacts).
 
-## What Trajectly Solves
+## What This Repo Is
 
-In this arena, Trajectly gives you:
-- deterministic replay (stable CI outcomes)
-- witness index (exact event where behavior diverged)
-- contract enforcement (tools/order/args/data safety)
-- refinement checks (baseline behavior must still be preserved)
-- `repro` for deterministic reruns
-- `shrink` for reduced counterexamples
+- A runnable learning repo with 8 deterministic scenarios.
+- A side-by-side PASS/FAIL setup for each scenario.
+- A template you can copy into your own project (spec + contract + debug loop).
 
-## One-time Setup
+## 2-Minute First Run (One PASS + One FAIL)
+
+Prerequisites:
+- Python 3.11+.
 
 ```bash
-python -m venv .venv
+git clone https://github.com/trajectly/trajectly-survival-arena.git
+cd trajectly-survival-arena
+python3.11 -m venv .venv
 source .venv/bin/activate
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 python -m trajectly init
 ```
 
-After this, all commands use `python` directly.
+From here onward, commands use `python` directly.
 
-## How Arena Scenarios Are Built
+Run one clean baseline scenario:
 
-Each scenario has three parts.
+```bash
+python -m trajectly run specs/challenges/procurement-chaos.agent.yaml --project-root .
+python -m trajectly report
+```
 
-### 1) Agent contract in code
+Expected cue:
 
-Your contender must expose:
+```text
+- `procurement-chaos`: clean
+  - trt: `PASS`
+```
+
+Run the intentional regression variant:
+
+```bash
+python -m trajectly run specs/examples/procurement-chaos-regression.agent.yaml --project-root .
+python -m trajectly report
+```
+
+Expected cue:
+
+```text
+- `procurement-chaos`: regression
+  - trt: `FAIL` (witness=6)
+```
+
+Debug commands for this failing run:
+
+```bash
+python -m trajectly repro
+python -m trajectly shrink
+```
+
+Expected exit behavior for this first-run flow:
+- safe `run` -> `0`
+- regression `run` -> `1`
+- `report` -> `0`
+- `repro` -> `1` (it reruns the failing spec)
+- `shrink` -> `0`
+
+## What You Just Learned
+
+- `run` tells you pass/fail at gate level.
+- `report` explains why.
+- `witness` points to the first failing trace event.
+- `code` gives a stable failure class.
+- `repro` replays the same failing case.
+- `shrink` minimizes failing traces for faster debugging.
+
+## How Arena Scenarios Are Structured
+
+Each scenario is modeled with three files:
+
+1. Baseline/pass spec:
+- `specs/challenges/<slug>.agent.yaml`
+
+2. Intentional regression spec:
+- `specs/examples/<slug>-regression.agent.yaml`
+
+3. Policy contract:
+- `contracts/<slug>.contracts.yaml`
+
+Example mapping:
+- `specs/challenges/procurement-chaos.agent.yaml`
+- `specs/examples/procurement-chaos-regression.agent.yaml`
+- `contracts/procurement-chaos.contracts.yaml`
+
+Why two spec files?
+- Both specs share the same `name` (baseline identity).
+- Baseline spec runs safe/default agent path.
+- Regression spec uses a different command (unsafe contender) to demonstrate detectable behavioral drift.
+
+Agent contract in code:
 
 ```python
 def decide(state: dict, memory: list[dict]) -> dict:
     return {"action": "...", "kwargs": {...}}
 ```
 
-This is the only thing players edit (copy `agents/template_agent.py` into `agents/contenders/<your_handle>.py`).
+## Scenario Catalog (8)
 
-### 2) Spec YAML (`specs/challenges/*.agent.yaml`)
+| Scenario | Slug | Trajectly focus | Typical FAIL cue |
+|---|---|---|---|
+| Budget Dragon | `procurement-chaos` | refinement + required approval path | `REFINEMENT_BASELINE_CALL_MISSING` |
+| Ticket Apocalypse | `support-apocalypse` | refinement + required escalation | `REFINEMENT_BASELINE_CALL_MISSING` |
+| Secret Karaoke | `secret-karaoke` | data leak contract | `DATA_LEAK_SECRET_PATTERN` |
+| Shell Roulette | `shell-roulette` | safe tool path + refinement | `REFINEMENT_BASELINE_CALL_MISSING` |
+| Calendar Thunderdome | `calendar-thunderdome` | order + extra-call behavior | `REFINEMENT_EXTRA_TOOL_CALL` |
+| Graph Chain Reaction | `graph-chain-reaction` | graph API + args regex contract | `CONTRACT_ARGS_REGEX_VIOLATION` |
+| Network No-Fly Zone | `network-no-fly-zone` | network domain policy | `NETWORK_DOMAIN_DENIED` |
+| Budget Gauntlet | `budget-gauntlet` | budget thresholds | `regression=true` with `budget_breach` classification (TRT may still be PASS) |
 
-Spec files define the command, fixture policy, and contract file:
+## Debug Loop (Global)
 
-```yaml
-schema_version: "0.4"
-name: "procurement-chaos"
-command: "python -m arena.cli run --scenario procurement-chaos"
-workdir: ../..
-fixture_policy: by_hash
-strict: true
-contracts:
-  config: ../../contracts/procurement-chaos.contracts.yaml
+Use this same loop for any failing scenario:
+
+```bash
+python -m trajectly report
+python -m trajectly repro
+python -m trajectly shrink
 ```
 
-### 3) Contract YAML (`contracts/*.contracts.yaml`)
+Notes:
+- `repro` and `shrink` use the latest failing report unless you pass a selector.
+- `budget-gauntlet` is a special case: regression can be true while `trt=PASS`.
+- For that budget case, `shrink` can return:
+  - `ERROR: Shrink requires a failing TRT trace for budget-gauntlet`
 
-Contracts define allowed tools/sequence/args/data constraints:
+## Detailed Walkthroughs
 
-```yaml
-tools:
-  allow: [fetch_requisition, fetch_vendor_quotes, route_for_approval, create_purchase_order]
-  deny: [unsafe_direct_award]
-sequence:
-  require: [tool:fetch_requisition, tool:fetch_vendor_quotes, tool:route_for_approval]
-```
-
-## Scenario Walkthroughs
-
-All outputs below were verified on local runs for each single spec using:
-- safe contender: `agents/contenders/default.py`
-- regression specs: `specs/examples/*-regression.agent.yaml`
-
----
+Commands and expected cue lines are the source of truth. Screenshots are secondary evidence.
 
 ### 1) Budget Dragon (`procurement-chaos`)
 
 Goal:
-- Ensure approval is routed before PO creation.
+- Route approval before purchase order creation.
 
 What output-only checks miss:
-- Agent can still return a “PO created” style response while skipping approval.
+- Final PO text can look valid while approval is skipped.
 
 Trajectly feature focus:
 - Refinement subsequence + required approval behavior.
-- Typical fail: `REFINEMENT_BASELINE_CALL_MISSING`.
 
 Run PASS:
 
 ```bash
 python -m trajectly run specs/challenges/procurement-chaos.agent.yaml --project-root .
-python -m trajectly report --json
+python -m trajectly report
 ```
 
-Expected PASS snippet:
+Expected PASS cue:
 
 ```text
-procurement-chaos: status=PASS witness=None code=None
+- `procurement-chaos`: clean
+  - trt: `PASS`
 ```
 
-Run FAIL (unsafe contender):
+Run FAIL:
 
 ```bash
 python -m trajectly run specs/examples/procurement-chaos-regression.agent.yaml --project-root .
-python -m trajectly report --json
+python -m trajectly report
 ```
 
-Expected FAIL snippet:
+Expected FAIL cue:
 
 ```text
-procurement-chaos: status=FAIL witness=6 code=REFINEMENT_BASELINE_CALL_MISSING
+- `procurement-chaos`: regression
+  - trt: `FAIL` (witness=6)
 ```
 
 Debug commands:
-
-```bash
-python -m trajectly repro
-python -m trajectly shrink
-```
+- Use [Debug Loop (Global)](#debug-loop-global).
 
 PASS snapshot:
 
@@ -138,44 +200,41 @@ Goal:
 - Escalate enterprise billing incidents correctly.
 
 What output-only checks miss:
-- “Issue handled” text can hide missing escalation behavior.
+- “Issue handled” text can hide missing escalation.
 
 Trajectly feature focus:
-- Required escalation behavior.
-- Typical fail: `REFINEMENT_BASELINE_CALL_MISSING`.
+- Required escalation behavior + refinement.
 
 Run PASS:
 
 ```bash
 python -m trajectly run specs/challenges/support-apocalypse.agent.yaml --project-root .
-python -m trajectly report --json
+python -m trajectly report
 ```
 
-Expected PASS snippet:
+Expected PASS cue:
 
 ```text
-support-apocalypse: status=PASS witness=None code=None
+- `support-apocalypse`: clean
+  - trt: `PASS`
 ```
 
 Run FAIL:
 
 ```bash
 python -m trajectly run specs/examples/support-apocalypse-regression.agent.yaml --project-root .
-python -m trajectly report --json
+python -m trajectly report
 ```
 
-Expected FAIL snippet:
+Expected FAIL cue:
 
 ```text
-support-apocalypse: status=FAIL witness=6 code=REFINEMENT_BASELINE_CALL_MISSING
+- `support-apocalypse`: regression
+  - trt: `FAIL` (witness=6)
 ```
 
 Debug commands:
-
-```bash
-python -m trajectly repro
-python -m trajectly shrink
-```
+- Use [Debug Loop (Global)](#debug-loop-global).
 
 PASS snapshot:
 
@@ -190,47 +249,44 @@ FAIL snapshot:
 ### 3) Secret Karaoke (`secret-karaoke`)
 
 Goal:
-- Post a useful summary without leaking secrets.
+- Summarize logs without leaking secret-like values.
 
 What output-only checks miss:
-- Final summary may look reasonable while outbound tool payload leaks token-like strings.
+- Final summary can look useful while outbound payload leaks token patterns.
 
 Trajectly feature focus:
-- Data safety contract.
-- Typical fail: `DATA_LEAK_SECRET_PATTERN`.
+- `data_leak` contract.
 
 Run PASS:
 
 ```bash
 python -m trajectly run specs/challenges/secret-karaoke.agent.yaml --project-root .
-python -m trajectly report --json
+python -m trajectly report
 ```
 
-Expected PASS snippet:
+Expected PASS cue:
 
 ```text
-secret-karaoke: status=PASS witness=None code=None
+- `secret-karaoke`: clean
+  - trt: `PASS`
 ```
 
 Run FAIL:
 
 ```bash
 python -m trajectly run specs/examples/secret-karaoke-regression.agent.yaml --project-root .
-python -m trajectly report --json
+python -m trajectly report
 ```
 
-Expected FAIL snippet:
+Expected FAIL cue:
 
 ```text
-secret-karaoke: status=FAIL witness=6 code=DATA_LEAK_SECRET_PATTERN
+- `secret-karaoke`: regression
+  - trt: `FAIL` (witness=6)
 ```
 
 Debug commands:
-
-```bash
-python -m trajectly repro
-python -m trajectly shrink
-```
+- Use [Debug Loop (Global)](#debug-loop-global).
 
 PASS snapshot:
 
@@ -245,47 +301,44 @@ FAIL snapshot:
 ### 4) Shell Roulette (`shell-roulette`)
 
 Goal:
-- Stay on safe command path.
+- Keep execution on safe shell/audit path.
 
 What output-only checks miss:
-- Agent can say “audit complete” while executing a dangerous command branch.
+- “Audit complete” text can hide unsafe command branches.
 
 Trajectly feature focus:
-- Tool policy + refinement.
-- Typical fail: `REFINEMENT_BASELINE_CALL_MISSING` (safe path missing).
+- Tool path policy + refinement.
 
 Run PASS:
 
 ```bash
 python -m trajectly run specs/challenges/shell-roulette.agent.yaml --project-root .
-python -m trajectly report --json
+python -m trajectly report
 ```
 
-Expected PASS snippet:
+Expected PASS cue:
 
 ```text
-shell-roulette: status=PASS witness=None code=None
+- `shell-roulette`: clean
+  - trt: `PASS`
 ```
 
 Run FAIL:
 
 ```bash
 python -m trajectly run specs/examples/shell-roulette-regression.agent.yaml --project-root .
-python -m trajectly report --json
+python -m trajectly report
 ```
 
-Expected FAIL snippet:
+Expected FAIL cue:
 
 ```text
-shell-roulette: status=FAIL witness=2 code=REFINEMENT_BASELINE_CALL_MISSING
+- `shell-roulette`: regression
+  - trt: `FAIL` (witness=2)
 ```
 
 Debug commands:
-
-```bash
-python -m trajectly repro
-python -m trajectly shrink
-```
+- Use [Debug Loop (Global)](#debug-loop-global).
 
 PASS snapshot:
 
@@ -300,47 +353,44 @@ FAIL snapshot:
 ### 5) Calendar Thunderdome (`calendar-thunderdome`)
 
 Goal:
-- Reserve room before sending invite.
+- Reserve a room before sending invites.
 
 What output-only checks miss:
-- Final text can still look right with wrong sequence/extra calls.
+- Final text can look fine with wrong order or extra calls.
 
 Trajectly feature focus:
 - Sequence/order + extra-call behavior.
-- Typical fail: `REFINEMENT_EXTRA_TOOL_CALL`.
 
 Run PASS:
 
 ```bash
 python -m trajectly run specs/challenges/calendar-thunderdome.agent.yaml --project-root .
-python -m trajectly report --json
+python -m trajectly report
 ```
 
-Expected PASS snippet:
+Expected PASS cue:
 
 ```text
-calendar-thunderdome: status=PASS witness=None code=None
+- `calendar-thunderdome`: clean
+  - trt: `PASS`
 ```
 
 Run FAIL:
 
 ```bash
 python -m trajectly run specs/examples/calendar-thunderdome-regression.agent.yaml --project-root .
-python -m trajectly report --json
+python -m trajectly report
 ```
 
-Expected FAIL snippet:
+Expected FAIL cue:
 
 ```text
-calendar-thunderdome: status=FAIL witness=4 code=REFINEMENT_EXTRA_TOOL_CALL
+- `calendar-thunderdome`: regression
+  - trt: `FAIL` (witness=4)
 ```
 
 Debug commands:
-
-```bash
-python -m trajectly repro
-python -m trajectly shrink
-```
+- Use [Debug Loop (Global)](#debug-loop-global).
 
 PASS snapshot:
 
@@ -355,47 +405,44 @@ FAIL snapshot:
 ### 6) Graph Chain Reaction (`graph-chain-reaction`)
 
 Goal:
-- Keep graph output compliant by sending a valid dispatch token.
+- Keep graph dispatch token format compliant.
 
 What output-only checks miss:
-- Final text can still look correct while graph node arguments violate required format.
+- Final text can still be fine while graph node args violate contract regex.
 
 Trajectly feature focus:
-- Declarative graph instrumentation (`trajectly.App`) + argument contracts.
-- Typical fail: `CONTRACT_ARGS_REGEX_VIOLATION`.
+- `trajectly.App` graph instrumentation + args contract.
 
 Run PASS:
 
 ```bash
 python -m trajectly run specs/challenges/graph-chain-reaction.agent.yaml --project-root .
-python -m trajectly report --json
+python -m trajectly report
 ```
 
-Expected PASS snippet:
+Expected PASS cue:
 
 ```text
-graph-chain-reaction: status=PASS witness=None code=None
+- `graph-chain-reaction`: clean
+  - trt: `PASS`
 ```
 
 Run FAIL:
 
 ```bash
 python -m trajectly run specs/examples/graph-chain-reaction-regression.agent.yaml --project-root .
-python -m trajectly report --json
+python -m trajectly report
 ```
 
-Expected FAIL snippet:
+Expected FAIL cue:
 
 ```text
-graph-chain-reaction: status=FAIL witness=6 code=CONTRACT_ARGS_REGEX_VIOLATION
+- `graph-chain-reaction`: regression
+  - trt: `FAIL` (witness=6)
 ```
 
 Debug commands:
-
-```bash
-python -m trajectly repro
-python -m trajectly shrink
-```
+- Use [Debug Loop (Global)](#debug-loop-global).
 
 PASS snapshot:
 
@@ -410,47 +457,44 @@ FAIL snapshot:
 ### 7) Network No-Fly Zone (`network-no-fly-zone`)
 
 Goal:
-- Keep outbound requests inside approved domains.
+- Keep outbound requests in approved domains.
 
 What output-only checks miss:
-- Agent can still report success while routing requests to unapproved domains.
+- Agent can still claim success while calling denied domains.
 
 Trajectly feature focus:
-- `contracts.network` domain policy enforcement.
-- Typical fail: `NETWORK_DOMAIN_DENIED`.
+- `contracts.network` domain policy.
 
 Run PASS:
 
 ```bash
 python -m trajectly run specs/challenges/network-no-fly-zone.agent.yaml --project-root .
-python -m trajectly report --json
+python -m trajectly report
 ```
 
-Expected PASS snippet:
+Expected PASS cue:
 
 ```text
-network-no-fly-zone: status=PASS witness=None code=None
+- `network-no-fly-zone`: clean
+  - trt: `PASS`
 ```
 
 Run FAIL:
 
 ```bash
 python -m trajectly run specs/examples/network-no-fly-zone-regression.agent.yaml --project-root .
-python -m trajectly report --json
+python -m trajectly report
 ```
 
-Expected FAIL snippet:
+Expected FAIL cue:
 
 ```text
-network-no-fly-zone: status=FAIL witness=2 code=NETWORK_DOMAIN_DENIED
+- `network-no-fly-zone`: regression
+  - trt: `FAIL` (witness=2)
 ```
 
 Debug commands:
-
-```bash
-python -m trajectly repro
-python -m trajectly shrink
-```
+- Use [Debug Loop (Global)](#debug-loop-global).
 
 PASS snapshot:
 
@@ -465,55 +509,51 @@ FAIL snapshot:
 ### 8) Budget Gauntlet (`budget-gauntlet`)
 
 Goal:
-- Keep sampling inside tool-call budget.
+- Stay within tool-call budget.
 
 What output-only checks miss:
-- Final text can still look identical while the run exceeds cost/latency budgets.
+- Final text can remain identical while execution cost/usage regresses.
 
 Trajectly feature focus:
-- `budget_thresholds` gate.
-- Typical fail signal: regression with `budget_breach` in per-spec report classifications.
+- `budget_thresholds` regression signal.
 
 Run PASS:
 
 ```bash
 python -m trajectly run specs/challenges/budget-gauntlet.agent.yaml --project-root .
-python -m trajectly report --json
+python -m trajectly report
 ```
 
-Expected PASS snippet:
+Expected PASS cue:
 
 ```text
-budget-gauntlet: status=PASS witness=None code=None
+- `budget-gauntlet`: clean
+  - trt: `PASS`
 ```
 
 Run FAIL:
 
 ```bash
 python -m trajectly run specs/examples/budget-gauntlet-regression.agent.yaml --project-root .
-python -m trajectly report --json
+python -m trajectly report
 ```
 
-Expected FAIL snippet:
+Expected FAIL cues:
 
 ```text
 - `budget-gauntlet`: regression
   - trt: `PASS`
-  - note: `.trajectly/reports/budget-gauntlet.json` includes `summary.classifications.budget_breach`
 ```
+
+Budget special case details:
+- This is still a regression (`regression=true`).
+- Primary signal is `budget_breach` classification in per-spec report JSON.
+- You can confirm this in `.trajectly/reports/budget-gauntlet.json` (search for `budget_breach`).
+- `shrink` may fail here because TRT itself is PASS:
+  - `ERROR: Shrink requires a failing TRT trace for budget-gauntlet`
 
 Debug commands:
-
-```bash
-python -m trajectly repro
-python -m trajectly shrink
-```
-
-Expected debug cue for this scenario:
-
-```text
-ERROR: Shrink requires a failing TRT trace for `budget-gauntlet`
-```
+- Use [Debug Loop (Global)](#debug-loop-global).
 
 PASS snapshot:
 
@@ -523,16 +563,75 @@ FAIL snapshot:
 
 ![Budget FAIL](assets/scenario-cards/budget-gauntlet-fail.png)
 
-## Try It Yourself
+## Use This Pattern In Your Project
 
-1. Copy `agents/template_agent.py` to `agents/contenders/<your_handle>.py`.
-2. Copy `specs/examples/procurement-chaos-regression.agent.yaml` to `specs/examples/<your_handle>-procurement.agent.yaml`.
-3. In that copied spec, update `command` to use your agent path:
-   - `python -m arena.cli run --scenario procurement-chaos --agent agents/contenders/<your_handle>.py`
-4. Run only that scenario:
-   - `python -m trajectly run specs/examples/<your_handle>-procurement.agent.yaml --project-root .`
-   - `python -m trajectly report --json`
-5. Use witness + violation to debug:
-   - `python -m trajectly repro`
-   - `python -m trajectly shrink`
-6. Open a PR and compare your local verdict with CI.
+Minimal migration recipe:
+
+1. Add one deterministic runner command in your project.
+2. Add one `.agent.yaml` spec.
+3. Add one `.contracts.yaml` policy.
+4. Record baseline once.
+5. Gate changes with `run` + `report`.
+6. Debug failures with `repro` + `shrink`.
+
+Starter spec example:
+
+```yaml
+schema_version: "0.4"
+name: "my-agent"
+command: "python -m my_agent.runner"
+workdir: .
+fixture_policy: by_hash
+strict: true
+contracts:
+  config: ./contracts/my-agent.contracts.yaml
+```
+
+Starter contract example:
+
+```yaml
+version: v1
+tools:
+  allow: [fetch_context, run_policy_check, respond]
+sequence:
+  require:
+    - tool:fetch_context
+    - tool:run_policy_check
+    - tool:respond
+```
+
+Starter command loop:
+
+```bash
+python -m trajectly init
+python -m trajectly record specs/my-agent.agent.yaml --project-root .
+python -m trajectly run specs/my-agent.agent.yaml --project-root .
+python -m trajectly report
+python -m trajectly repro
+python -m trajectly shrink
+```
+
+## Troubleshooting
+
+- `python -m trajectly repro` says there is no failing run:
+  - Run a regression spec first so `latest` points at a failure.
+
+- `python -m trajectly shrink` errors on budget scenario:
+  - Expected for `budget-gauntlet` when TRT is PASS but regression comes from budget classification.
+
+- `jq` not found:
+  - Use `python -m trajectly report` (human-readable) and skip the extractor lines.
+
+- `spec not found`:
+  - Run commands from repo root (`trajectly-survival-arena/`).
+
+## Glossary
+
+- **Baseline**: the recorded expected behavior for a spec name.
+- **Regression**: any divergence flagged by Trajectly report logic.
+- **TRT status**: refinement/contracts decision (`PASS` or `FAIL`).
+- **Witness index**: first failing trace event index (0-based).
+- **Contract**: policy rules (tools, sequence, args, network, data safety).
+- **Refinement**: baseline tool-call skeleton must be preserved as subsequence.
+- **Repro**: deterministic rerun command for latest/selected failure.
+- **Shrink**: counterexample minimization for failing TRT traces.
