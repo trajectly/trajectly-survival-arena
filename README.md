@@ -16,6 +16,50 @@ Trajectly catches that regression and gives deterministic evidence (`witness`, v
 - A side-by-side PASS/FAIL setup for each scenario.
 - A template you can copy into your own project (spec + contract + debug loop).
 
+## What This Arena Tests
+
+Each scenario demonstrates a category of silent failure that correct-looking final text can hide.
+
+### Missing steps
+
+The agent skips a required step but the final answer reads fine.
+
+- **procurement-chaos**: The agent skips approval and goes straight to purchase order. The output says "PO created" either way. Only the trajectory reveals the missing step.
+- **support-apocalypse**: A calm "Issue handled" reply hides the fact that the required escalation never happened.
+- **shell-roulette**: "Audit complete" text looks identical whether the agent took the safe path or the disallowed one.
+
+### Wrong order
+
+The right tools called in the wrong sequence.
+
+- **calendar-thunderdome**: The invite fires before the room is reserved. "Meeting arranged" sounds correct either way.
+
+### Leaked secrets
+
+The summary looks clean but the outbound payload leaks sensitive values.
+
+- **secret-karaoke**: A log summary can be perfectly readable while the `post_summary` call body leaks an API key pattern.
+
+### Forbidden network access
+
+The agent claims success but contacted a domain outside the allowlist.
+
+- **network-no-fly-zone**: The agent can report success even though it reached out to a forbidden domain.
+
+### Invalid arguments
+
+A tool call completes but an argument silently violates its format contract.
+
+- **graph-chain-reaction**: The graph finishes and prints success while a dispatch token breaks its regex constraint.
+
+### Budget overruns
+
+Identical output, but execution cost quietly regressed.
+
+- **budget-gauntlet**: The final text stays the same while tool-call count or token usage doubles.
+
+---
+
 ## 2-Minute First Run (One PASS + One FAIL)
 
 Prerequisites:
