@@ -69,7 +69,7 @@ Prerequisites:
 git clone https://github.com/trajectly/trajectly-survival-arena.git
 cd trajectly-survival-arena
 python3.11 -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 python -m trajectly init
