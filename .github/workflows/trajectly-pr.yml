@@ -32,7 +32,7 @@ jobs:
       - name: Run Trajectly gate
         id: trt
         continue-on-error: true
-        uses: trajectly/trajectly-action@v1.0.1
+        uses: trajectly/trajectly-action@v1.0.2
         with:
           spec_glob: "specs/challenges/*.agent.yaml"
           project_root: "."
